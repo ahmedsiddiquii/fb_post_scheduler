@@ -164,14 +164,15 @@ def title(request):
       form.save()
 
    else:
-      form = post_form()
+      form = post_form(user=request.user)
    obj  = list(PageModel.objects.filter(username=request.user).values())
    choices = [(request.user,request.user)]
    for i in obj:
       choices.append((i['page_id'],i['page_id']))
    choices = tuple(choices)
    print(choices)
-   form.fields['post_as'].choices = choices
+   # user = request.user
+   # form.fields['post_as'].choices = choices
    return render(request,'title.html',{'form':form})
 
 

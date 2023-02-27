@@ -27,10 +27,23 @@ class PostModel(models.Model):
 
     title = models.CharField(max_length=200, default=None)
     text = models.CharField(max_length=200, default=None)
-    post_as = models.CharField(max_length=200, default=None,choices=None)
+    post_as = models.CharField(max_length=200, default=None)
     every = models.CharField(max_length=200, default=None,choices=GENDER_CHOICES)
     time = models.TimeField(default=None)
     group = models.CharField(max_length=200, default=None)
     image = models.ImageField(upload_to="images/",default=None,blank=True)
     username = models.CharField(max_length=100, default=None,null=True)
     status = models.CharField(max_length=100, default=None, null=True)
+
+    def update_choices(self, user):
+        # Get data from ModelB for the current user and generate choices
+        obj = list(PageModel.objects.filter(username=user).values())
+        choices = [(user, user)]
+        for i in obj:
+            print(i)
+            choices.append((i['page_id'], i['page_id']))
+        choices = tuple(choices)
+
+        self._meta.get_field('post_as').choices = choices
+        return choices
+

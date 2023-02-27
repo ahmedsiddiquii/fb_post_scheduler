@@ -4,7 +4,9 @@ from .models import *
 class post_form(forms.ModelForm):
     username = forms.CharField(required=False)
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
         self.fields['every'].widget.attrs.update({'style': 'background-color:white;\
         	height:40px;\
         	margin-left: 50px;\
@@ -13,6 +15,10 @@ class post_form(forms.ModelForm):
         	color:black;\
         box-shadow: 0px 0px 30px 0px rgb(190, 190, 190);\
         '})
+        # self.fields['post_as'] = forms.ChoiceField(choices=())
+        if user:
+            choices=self.instance.update_choices(user=user)
+            self.fields['post_as'] = forms.ChoiceField(choices=choices)
         self.fields['post_as'].widget.attrs.update({'style': 'background-color:white;\
                 	height:40px;\
                 	margin-left: 50px;\
@@ -21,6 +27,7 @@ class post_form(forms.ModelForm):
                 	color:black;\
                 box-shadow: 0px 0px 30px 0px rgb(190, 190, 190);\
                 '})
+        # self.fields['post_as'] = for
     class Meta:
         model = PostModel
         fields = ['title', 'text', 'post_as',"every","time","group","image","username"]
