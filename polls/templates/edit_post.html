@@ -47,98 +47,82 @@
 	</nav>
 <br>
 <br>
-<h2 style=>Manage Accounts</h2>
-<br>
-<div style="display: flex;
-  justify-content: center;
-padding:20px;">
-	<button style="background-color:white;
-	height:40px;
-	width:130px;
-	color:blue;
-	border-radius:6px;
-	margin-left: 50px;
-box-shadow: 0px 0px 29px 0px rgb(220, 220, 210);
-font-weight: bold;
-" onclick="location.href='{% url 'add_account' %}'">Add Account</button>
-	<button style="background-color:white;
-	height:40px;
-	margin-left: 50px;
-	width:160px;
-	border-radius:6px;
-	color:red;
-box-shadow: 0px 0px 29px 0px rgb(220, 220, 210);
-font-weight: bold;
-">Remove & Logout</button>
-	<button style="background-color:white;
-	height:40px;
-	margin-left: 50px;
-	width:180px;
-	border-radius:6px;
-	color:green;
-box-shadow: 0px 0px 29px 0px rgb(220, 220, 210);
-font-weight: bold;
-">Change Password</button>
-</div>
-<div class="fixedButton"><button class="roundedFixedBtn" onclick="location.href='{% url 'post' %}'">➥</button></div>
 
-<br>
+
+
+<div class="fixedButton" style="position: fixed;
+            bottom: 0px;
+            left: 0px;
+            padding: 30px;"><button class="roundedFixedBtn" onclick="location.href='{% url 'post' %}'">↩</button></div>
+
+
 <div class="container">
-  <h2>Connected Pages</h2>
-	<br>
-  <ul class="responsive-table">
-    <li class="table-header">
-      <div class="col col-1" >Page id</div>
-      <div class="col col-2">Delete</div>
+  <h2>Add Post</h2>
+    <form method="post" action="{% url 'update_post' %}" enctype='multipart/form-data'>
+        {% csrf_token %}
+<!--		{{ form.as_p }}-->
+    <br>
+    <div  >
+		  <label style="color:blue;">Title</label>
+						{{ form.title }}
 
-    </li>
-	  {% for page in pages %}
-    <li class="table-row">
-      <div class="col col-1" data-label="Description">{{ page.page_id }}</div>
-      <a style="float:right; margin:5px; color: white;" href="/delete_page/{{page.page_id}}/" class="btn btn-danger btn-sm" >Delete</a>
+					</div>
+    <br>
 
-    </li>
-	  {% endfor %}
-	  <br>
-	  <div  >
-		  <form method="post" action="{% url 'save_page' %}">
-			  {% csrf_token %}
-		  <label >Page Username</label>
-						<input  type="text" name="page_id" style="background-color:white;
-	height:40px;
-	margin-left: 50px;
-	width:300px;
-	border-radius:6px;
-	color:black;
-box-shadow: 0px 0px 19px 0px rgb(180, 180, 180);
+    <div>
+		  <label style="color:blue;">Text</label>
+						{{ form.text }}
+					</div>
+    <br>
+    <div  >
+		  <label style="color:blue;">Post As</label>
+						{{ form.post_as }}
 
-">
-		  <button style="background-color:white;
-	height:40px;
-	width:130px;
-	color:blue;
-	border-radius:6px;
-	margin-left: 50px;
-box-shadow: 0px 0px 19px 0px rgb(180, 180, 180);
-font-weight: bold;
-">Add Page</button></form>
+
+					</div>
+    <br>
+        <div>
+		  <label style="color:blue;">On Every</label>
+						{{ form.every }}
+
+
+
+            <label style="color:blue;padding:0px 20px;">At</label>
+						{{ form.time }}
+
+</div>
+
+    <br>
+    <div  >
+		  <label style="color:blue;">Image</label>
+						{{ form.image }}
+					</div>
+
+    <br>
+
+
+
+    <br>
+    <div  >
+		  <label style="color:blue;">Group</label>
+						{{ form.group }}
 					</div>
 
 
+    <br>
+    <div  style="justify-content: center;">
 
+						<button  type="submit" style="background-color:white;
+	height:40px;
+	margin-left: 10px;
+	width:140px;
+	border-radius:6px;
+	color:white;
+	background-color:blue;
 
-
-
-
-
-
-
-
-
-  </ul>
-
-	<br>
-</div>
+">Update</button>
+					</div>
+    </form>
 <!-- partial -->
 
 </body>

@@ -2,7 +2,10 @@ from django.shortcuts import render,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import views as auth_views
 from .models import *
+import datetime
 from django.contrib import messages,auth
+from .forms import *
+from django.shortcuts import redirect
 from django.template import loader
 from selenium.webdriver.support.ui import Select
 from selenium import webdriver
@@ -11,18 +14,168 @@ import time
 # driver = webdriver.Chrome(path)
 
 # Create your views here.
+
+def add_account(request):
+   if request.method=='POST':
+      try:
+         obj = FBAccount.objects.get(username=request.user)
+         email = request.POST['email']
+         password = request.POST['password']
+         obj.email = email
+         obj.password = password
+         obj.status = "run"
+         obj.save()
+      except Exception as e:
+         print(e)
+         email = request.POST['email']
+         password = request.POST['password']
+         obj = FBAccount()
+         obj.email = email
+         obj.password = password
+         obj.username = request.user
+         obj.status="run"
+         obj.save()
+      try:
+         obj = FBAccount.objects.get(username=request.user)
+         print(obj)
+         if obj:
+            return render(request, "add_account.html",{"email":obj.email,"password":obj.password})
+      except Exception as e:
+         print(e)
+         pass
+   else:
+      try:
+         obj = FBAccount.objects.get(username=request.user)
+         print(obj)
+         if obj:
+            return render(request, "add_account.html",{"email":obj.email,"password":obj.password})
+      except Exception as e:
+         print(e)
+         pass
+
+   return render(request,"add_account.html")
+def save_page(request):
+   if request.method=='POST':
+      page_id = request.POST['page_id']
+      obj = PageModel()
+      obj.page_id=page_id
+      obj.username = request.user
+      obj.save()
+      return redirect(home)
+
+def submit(request):
+   if request.method=='POST':
+      form = post_form(request.POST, request.FILES)
+      print(form.errors)
+      if form.is_valid():
+         form.instance.username = request.user
+         form.instance.status = "on"
+         form.save()
+         return redirect(post_p)
+
+      else:
+         form = post_form()
+      return render(request, 'title.html', {'form': form})
+
+def on_post(request,title=None):
+   obj = PostModel.objects.get(username=request.user, title=title)
+   print(obj.status)
+   obj.status="on"
+   print(obj.status)
+   obj.save()
+   return redirect(post_p)
+def off_post(request,title=None):
+   obj = PostModel.objects.get(username=request.user, title=title)
+   print(obj.status)
+   obj.status="off"
+   obj.save()
+   return redirect(post_p)
+def update_post(request):
+   if request.method=='POST':
+      obj = PostModel.objects.get(username=request.user, title=request.POST['title'])
+      form = post_form(request.POST, request.FILES,instance=obj)
+      # obj = PostModel.objects.get(username=request.user, title=form.title)
+
+
+      if form.is_valid():
+         # form.instance.username = request.user
+         # form.instance.status = "on"
+         # obj = PostModel.objects.get(username=form.instance.username,title=form.instance.title)
+         # obj.text = form.instance.text
+         form.save()
+
+         # form.save()
+         return redirect(post_p)
+
+      else:
+         form = post_form()
+      return render(request, 'title.html', {'form': form})
+
+def edit_post(request,title):
+   # obj = list(PostModel.objects.filter(username=request.user,title=title).values())[0]
+   obj=PostModel.objects.get(username=request.user,title=title)
+   form = post_form(instance=obj)
+   obj = list(PageModel.objects.filter(username=request.user).values())
+   choices = [(request.user, request.user)]
+   for i in obj:
+      choices.append((i['page_id'], i['page_id']))
+   choices = tuple(choices)
+   form.fields['post_as'].choices = choices
+   # form = post_form(initial={"title":obj['title'],"text":obj['text'],
+   #                           "post_as":obj["post_as"],"every":obj["every"],
+   #                           "time":obj['time'],"group":obj["group"],"image":obj['image']})
+
+   print(form)
+   # print(obj)
+   # form.title = obj['title']
+
+   return render(request,"edit_post.html",{'form':form})
 def login(request):
    return render(request, "index.html")   
 
 def home(request):
-   return render(request,'home.html')
+   print("Home")
+   obj=list(PageModel.objects.filter(username=request.user).values())
+
+
+   return render(request,'home.html',{'pages':obj})
+
+def delete_page(request,page_id=None):
+   print(request.method)
+
+   PageModel.objects.filter(username=request.user,page_id=page_id).delete()
+   return redirect(home)
+
+def delete_post(request,title=None):
+   print(request.method)
+
+   PostModel.objects.filter(username=request.user,title=title).delete()
+   return redirect(post_p)
 
 def post_p(request):
-   return render(request,'post.html')
+   obj = list(PostModel.objects.filter(username=request.user).values())
+   print(obj)
+   return render(request,'post.html',{'posts':obj})
 
 def title(request):
-   return render(request,'title.html')
+   print("Title page")
+   form = post_form(request.POST, request.FILES)
+   if form.is_valid():
+      form.save()
 
+   else:
+      form = post_form()
+   obj  = list(PageModel.objects.filter(username=request.user).values())
+   choices = [(request.user,request.user)]
+   for i in obj:
+      choices.append((i['page_id'],i['page_id']))
+   choices = tuple(choices)
+   print(choices)
+   form.fields['post_as'].choices = choices
+   return render(request,'title.html',{'form':form})
+
+
+@csrf_exempt
 def login_user(request):
    print("aaaaa")
    if request.method == 'POST':
@@ -33,10 +186,10 @@ def login_user(request):
          if user.is_active:
             auth.login(request, user)
          
-         return render('home.html')
+         return render(request,'home.html')
       else:
          
-         return render('login')
+         return render(request,'login')
    else:
       return render(request, 'index.html')
 

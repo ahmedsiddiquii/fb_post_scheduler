@@ -1,87 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" >
 <head>
-    <title>Home</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Activities</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+<link rel="stylesheet" href="../static/css/style.css">
     <!--===============================================================================================-->
-    <link rel="icon" type="image/png" href="../static/images/icons/favicon.ico" />
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/vendor/bootstrap/css/bootstrap.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/fonts/iconic/css/material-design-iconic-font.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/vendor/animate/animate.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/vendor/css-hamburgers/hamburgers.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/vendor/animsition/css/animsition.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/vendor/select2/select2.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/vendor/daterangepicker/daterangepicker.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="../static/css/util.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
-    <!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="../static/images/icons/favicon.ico" />
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/fonts/iconic/css/material-design-iconic-font.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/vendor/animate/animate.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/vendor/css-hamburgers/hamburgers.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/vendor/animsition/css/animsition.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/vendor/select2/select2.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/vendor/daterangepicker/daterangepicker.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="../static/css/util.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
+	<!--===============================================================================================-->
+
 </head>
-<nav class="navbar">
-    <div class="container-fluid">
-        <p class="navbar-brand">
-            AUTOMATE FACEBOOK
-            <a class="navbar-brand" href="#" >
-                <div style="margin-left: auto;">
-                <img src="user.png" width="30" height="30" class="d-inline-block align-top" alt="">
-            </div>
-            </a>
-        </p>
-    </div>
-</nav>
-
 <body>
+<!-- partial:index.partial.html -->
+<nav class="navbar" style="background-color:rgb(46, 46, 210)">
+		<div class="container-fluid">
+			<h1 class="navbar-brand" style="font-weight: bold;">
+				Welcome {{ user }}
+			</h1>
+				<li>
+					<form action=" {%url 'login_user'%} " method="post">
+						{% csrf_token %}
+						<button  class="btn btn-info btn-md" style="background-color:white;color:rgb(46, 46, 210);" type="Submit">Log out</button>
+					</form>
 
-    <div class="main">
-    <div class="input-tag">
+				</li>
+		</div>
+	</nav>
+<br>
+<br>
 
-        <div class="" style="padding-top: 4%;">
-            <button  type="submit" class="btn btn-primary" style="color: rgb(17, 190, 234); background-color: black;"onclick="window.location.href = 'title.html'">New Post</button>
-        </div>
-        <div style="border-radius: 5px;">
-            <input type="text">
-            <i style="font-size:24px" class="fa">&#xf044;</i>
-            
-        </div>
-        <div style="border-radius: 5px;">
-            <input type="text">
-            <i style="font-size:24px" class="fa">&#xf044;</i>
-            
-        </div>
-        
 
-        </form>
-            
+<div class="fixedButton" style="position: fixed;
+            bottom: 0px;
+            left: 0px;
+            padding: 30px;"><button class="roundedFixedBtn" onclick="location.href='{% url 'home' %}'">↩</button></div>
+
+<br>
+<div class="fixedButton"><button class="roundedFixedBtn" onclick="location.href='{% url 'title' %}'">+</button></div>
+<div class="container">
+  <h2>Scheduled Posts</h2>
+	<br>
+  <ul class="responsive-table">
+    <li class="table-header">
+      <div class="col col-1" >Title</div>
+      <div class="col col-2">Time</div>
+        <div class="col col-3">Edit</div>
+        <div class="col col-4">Off</div>
+        <div class="col col-5">Delete</div>
+
+
+    </li>
+	  {% for post in posts %}
+    <li class="table-row">
+      <div class="col col-1" data-label="Title">{{ post.title }} </div>
+		<div class="col col-2" data-label="Time">{{ post.every }} {{ post.time }}</div>
+		<div class="col col-3" data-label="Edit"><a style="float:right; margin:5px; color: white;background-color:green;width:100px;" class="btn btn-danger btn-sm" href="/edit_post/{{post.title}}/"  >Edit</a></div>
+			{% if post.status == 'on' %}
+			<div class="col col-4" data-label="Off"><a style="float:right; margin:5px; color: white;background-color:black;width:100px;" class="btn btn-danger btn-sm" href="/off_post/{{post.title}}/"  >Off</a></div>
+			{% else %}
+			<div class="col col-4" data-label="Off"><a style="float:right; margin:5px; color: white;background-color:black;width:100px;" class="btn btn-danger btn-sm" href="/on_post/{{post.title}}/"  >On</a></div>
+			{% endif %}
+		<div class="col col-5" data-label="Delete"><a style="float:right; margin:5px; color: white;background-color:red;width:100px;" class="btn btn-danger btn-sm" href="/delete_post/{{post.title}}/"  >Delete</a></div>
+
+
+
+    </li>
+	  {% endfor %}
+	  <br>
+
+
+
+
+
+
+
+
+
+
+
+
+  </ul>
 </div>
-
-    <!--===============================================================================================-->
-    <script src="../static/vendor/jquery/jquery-3.2.1.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="../static/vendor/animsition/js/animsition.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="../static/vendor/bootstrap/js/popper.js"></script>
-    <script src="../static/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="../static/vendor/select2/select2.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="../static/vendor/daterangepicker/moment.min.js"></script>
-    <script src="../static/vendor/daterangepicker/daterangepicker.js"></script>
-    <!--===============================================================================================-->
-    <script src="../static/vendor/countdowntime/countdowntime.js"></script>
-    <!--===============================================================================================-->
-    <script src="../static/js/main.js"></script>
+<!-- partial -->
 
 </body>
-
 </html>
