@@ -37,10 +37,7 @@
 				Welcome {{ user }}
 			</h1>
 				<li>
-					<form action=" {%url 'login_user'%} " method="post">
-						{% csrf_token %}
-						<button  class="btn btn-info btn-md" style="background-color:white;color:rgb(46, 46, 210);" type="Submit">Log out</button>
-					</form>
+					<button  class="btn btn-info btn-md" style="background-color:white;color:rgb(46, 46, 210);" onclick="location.href='{% url 'logout_user' %}'">Log out</button>
 
 				</li>
 		</div>

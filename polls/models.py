@@ -38,7 +38,7 @@ class PostModel(models.Model):
     def update_choices(self, user):
         # Get data from ModelB for the current user and generate choices
         obj = list(PageModel.objects.filter(username=user).values())
-        choices = [(user, user)]
+        choices = [("Profile", "Profile")]
         for i in obj:
             print(i)
             choices.append((i['page_id'], i['page_id']))

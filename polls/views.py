@@ -10,6 +10,9 @@ from django.template import loader
 from selenium.webdriver.support.ui import Select
 from selenium import webdriver
 import time
+from django.utils import timezone
+import pytz
+import geoip2.database
 # path="E:/Analyt IQ/28th/chromedriver"
 # driver = webdriver.Chrome(path)
 
@@ -70,6 +73,39 @@ def submit(request):
       if form.is_valid():
          form.instance.username = request.user
          form.instance.status = "on"
+
+         user_time = form.instance.time
+         user_time = datetime.datetime.combine(datetime.datetime.today(), user_time)
+         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+         if x_forwarded_for:
+            user_ip = x_forwarded_for.split(',')[0]
+         else:
+            user_ip = request.META.get('REMOTE_ADDR')
+            user_ip = '202.47.55.117'
+
+         geoip_db = geoip2.database.Reader('GeoLite2-City.mmdb')
+         # Replace with the user's IP address
+         user_ip = user_ip
+         print(user_ip)
+
+         # Lookup the user's location using the GeoIP database
+         geoip_data = geoip_db.city(user_ip)
+
+         # Determine the user's timezone
+         user_tz = pytz.timezone(geoip_data.location.time_zone)
+         print(user_tz)
+
+         user_time = user_tz.localize(user_time)
+
+         # Convert the user input to UTC
+         utc_time = timezone.localtime(user_time, timezone.utc)
+
+         form.instance.time=utc_time.time()
+
+
+
+
+
          form.save()
          return redirect(post_p)
 
@@ -102,6 +138,36 @@ def update_post(request):
          # form.instance.status = "on"
          # obj = PostModel.objects.get(username=form.instance.username,title=form.instance.title)
          # obj.text = form.instance.text
+
+         user_time = form.instance.time
+         user_time = datetime.datetime.combine(datetime.datetime.today(), user_time)
+         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+         if x_forwarded_for:
+            user_ip = x_forwarded_for.split(',')[0]
+         else:
+            user_ip = request.META.get('REMOTE_ADDR')
+            user_ip = '202.47.55.117'
+
+         geoip_db = geoip2.database.Reader('GeoLite2-City.mmdb')
+         # Replace with the user's IP address
+         user_ip = user_ip
+         print(user_ip)
+
+         # Lookup the user's location using the GeoIP database
+         geoip_data = geoip_db.city(user_ip)
+
+         # Determine the user's timezone
+         user_tz = pytz.timezone(geoip_data.location.time_zone)
+         print(user_tz)
+
+         user_time = user_tz.localize(user_time)
+
+         # Convert the user input to UTC
+         utc_time = timezone.localtime(user_time, timezone.utc)
+
+         form.instance.time = utc_time.time()
+
+
          form.save()
 
          # form.save()
@@ -111,9 +177,12 @@ def update_post(request):
          form = post_form()
       return render(request, 'title.html', {'form': form})
 
-def edit_post(request,title):
+def edit_post(request,id):
+   # print(title)
+   # title=title.replace("%20"," ")
    # obj = list(PostModel.objects.filter(username=request.user,title=title).values())[0]
-   obj=PostModel.objects.get(username=request.user,title=title)
+
+   obj=PostModel.objects.get(username=request.user,id=id)
    form = post_form(instance=obj)
    obj = list(PageModel.objects.filter(username=request.user).values())
    choices = [(request.user, request.user)]
@@ -155,6 +224,33 @@ def delete_post(request,title=None):
 def post_p(request):
    obj = list(PostModel.objects.filter(username=request.user).values())
    print(obj)
+
+   x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+   if x_forwarded_for:
+      user_ip = x_forwarded_for.split(',')[0]
+   else:
+      user_ip = request.META.get('REMOTE_ADDR')
+      user_ip = '202.47.55.117'
+
+   for o in range(len(obj)):
+      user_time = obj[o]['time']  # Assuming user entered 4pm
+      user_time = datetime.datetime.combine(datetime.datetime.today(), user_time)
+
+      geoip_db = geoip2.database.Reader('GeoLite2-City.mmdb')
+      # Replace with the user's IP address
+      user_ip = user_ip
+      print(user_ip)
+
+      # Lookup the user's location using the GeoIP database
+      geoip_data = geoip_db.city(user_ip)
+
+      # Determine the user's timezone
+      user_tz = pytz.timezone(geoip_data.location.time_zone)
+      print(user_tz)
+
+      # Convert the UTC time to the user's timezone
+      user_time = user_time.replace(tzinfo=pytz.utc).astimezone(user_tz)
+      obj[o]['time'] = user_time.time()
    return render(request,'post.html',{'posts':obj})
 
 def title(request):
@@ -166,7 +262,7 @@ def title(request):
    else:
       form = post_form(user=request.user)
    obj  = list(PageModel.objects.filter(username=request.user).values())
-   choices = [(request.user,request.user)]
+   choices = [("Profile","Profile")]
    for i in obj:
       choices.append((i['page_id'],i['page_id']))
    choices = tuple(choices)
@@ -175,7 +271,11 @@ def title(request):
    # form.fields['post_as'].choices = choices
    return render(request,'title.html',{'form':form})
 
-
+def logout_user(request):
+   print("logout")
+   if request.method == 'POST':
+      auth.logout(request)
+   return redirect(login_user)
 @csrf_exempt
 def login_user(request):
    print("aaaaa")
@@ -187,12 +287,12 @@ def login_user(request):
          if user.is_active:
             auth.login(request, user)
          
-         return render(request,'home.html')
+         return redirect(home)
       else:
          
-         return render(request,'login')
+         return render(request,'index.html')
    else:
-      return render(request, 'index.html')
+      return render(request,'index.html')
 
 def title_post(request):
    print("bbbbbbbbbbbb")
