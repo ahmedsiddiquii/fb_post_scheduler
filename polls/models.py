@@ -14,6 +14,30 @@ class FBAccount(models.Model):
     password = models.CharField(max_length=100, default=None)
     username = models.CharField(max_length=100,default=None)
     status = models.CharField(max_length=100,default=None)
+
+class GroupModel(models.Model):
+    group_id = models.CharField(max_length=100, default=None)
+    group_name = models.CharField(max_length=100, default=None)
+    username = models.CharField(max_length=100,default=None)
+    # status = models.CharField(max_length=100,default=None)
+
+class GroupPosting(models.Model):
+    GENDER_CHOICES = (
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    )
+    group_id = models.CharField(max_length=100, default=None)
+    group_name = models.CharField(max_length=100, default=None)
+    post_id = models.IntegerField( default=None)
+    every = models.CharField(max_length=200, default=None, choices=GENDER_CHOICES)
+    time = models.TimeField(default=None)
+    username = models.CharField(max_length=100, default=None)
+    # status = models.CharField(max_length=100,default=None)
 class PostModel(models.Model):
     GENDER_CHOICES = (
         ('Monday', 'Monday'),
@@ -30,10 +54,11 @@ class PostModel(models.Model):
     post_as = models.CharField(max_length=200, default=None)
     every = models.CharField(max_length=200, default=None,choices=GENDER_CHOICES)
     time = models.TimeField(default=None)
-    group = models.CharField(max_length=200, default=None)
+    # group = models.CharField(max_length=200, default=None)
     image = models.ImageField(upload_to="images/",default=None,blank=True)
     username = models.CharField(max_length=100, default=None,null=True)
     status = models.CharField(max_length=100, default=None, null=True)
+    link = models.CharField(max_length=100, default=None, null=True)
 
     def update_choices(self, user):
         # Get data from ModelB for the current user and generate choices

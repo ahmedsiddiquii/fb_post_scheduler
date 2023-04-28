@@ -30,7 +30,7 @@ class post_form(forms.ModelForm):
         # self.fields['post_as'] = for
     class Meta:
         model = PostModel
-        fields = ['title', 'text', 'post_as',"every","time","group","image","username"]
+        fields = ['title', 'text', 'post_as',"every","time","image","username"]
         widgets = {
             'title': forms.TextInput(attrs={'style':'background-color:white;\
 	height:40px;\

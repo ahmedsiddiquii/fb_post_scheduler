@@ -153,6 +153,12 @@ def login_engine():
                 obj2.save()
 
 
+def start_thread_group(link, fb_email, fb_password,group_id):
+    global history
+    obj = BOT()
+    obj.login(fb_email, fb_password)
+    obj.group_post(link,group_id)
+    history.remove(group_id+"__"+str(i['id']))
 
 def start_thread(title,text,post_as,fb_email,fb_password,image,group,id):
     global history
@@ -163,10 +169,13 @@ def start_thread(title,text,post_as,fb_email,fb_password,image,group,id):
     else:
         obj.switch(post_as)
     try:
-        obj.post(title,text,group,image)
+        link=obj.page_post(title,text,post_as,image)
     except Exception as e:
         print(e)
         pass
+    obj2=PostModel.objects.get(id=id)
+    obj2.link=link
+    obj2.save()
     obj.driver.close()
     history.remove(id)
 
@@ -201,10 +210,14 @@ def main2():
 
 
                 if post_time_hour==time_hour and post_time_minute==time_minute and post_time_sec==time_sec and every==day_name and i['id'] not in history:
+                    print("Posting")
                     title = i['title']
                     text = i['text']
                     post_as = i['post_as']
-                    group  = i['group']
+                    try:
+                        group  = i['group']
+                    except:
+                        group=None
                     username = i['username']
                     obj2 = FBAccount.objects.filter(username=username).values()[0]
                     fb_email = obj2['email']
@@ -218,7 +231,32 @@ def main2():
                     s=threading.Thread(target=start_thread,args=(title,text,post_as,fb_email,fb_password,image,group,i['id']))
                     s.start()
 
+                grps = GroupPosting.objects.filter(post=i['id']).values()
+                for grp in list(grps):
+                    group_id = grp['group_id']
+                    post_time = grp['time']
+                    every = grp['every']
+                    post_time_hour, post_time_minute, post_time_sec = grp['time'].hour, grp['time'].minute, grp['time'].second
 
+                    now_time = datetime.datetime.now()
+                    # Get the local timezone
+                    local_timezone = get_localzone()
+                    # Make the datetime object timezone-aware
+                    now_time = local_timezone.localize(now_time)
+                    # time=.localize(local_time)
+                    utc_time = timezone.localtime(now_time, timezone.utc)
+
+                    time_hour, time_minute, time_sec = utc_time.hour, utc_time.minute, utc_time.second
+                    day_name = datetime.datetime.now().strftime("%A")
+
+                    if post_time_hour == time_hour and post_time_minute == time_minute and post_time_sec == time_sec and every == day_name and \
+                            group_id+"__"+str(i['id']) not in history:
+                        print("Posting")
+                        link=i['link']
+                        s = threading.Thread(target=start_thread_group,
+                                             args=(link, fb_email, fb_password,group_id))
+                        s.start()
+                        history.append(group_id+"__"+str(i['id']))
 
 
 

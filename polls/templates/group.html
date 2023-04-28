@@ -39,117 +39,91 @@
 				<li>
 					<button  class="btn btn-info btn-md" style="background-color:white;color:rgb(46, 46, 210);" onclick="location.href='{% url 'logout_user' %}'">Log out</button>
 
+
 				</li>
 		</div>
 	</nav>
 <br>
 <br>
-
-
-
+<!--</div>-->
 <div class="fixedButton" style="position: fixed;
             bottom: 0px;
             left: 0px;
-            padding: 30px;"><button class="roundedFixedBtn" onclick="location.href='{% url 'post' %}'">↩</button></div>
+            padding: 30px;"><button class="roundedFixedBtn" onclick="location.href='{% url 'home' %}'">↩</button></div>
+
+<br>
+<div class="fixedButton"><button class="roundedFixedBtn" onclick="location.href='{% url 'post' %}'">➥</button></div>
 
 
+<br>
 <div class="container">
-  <h2>Add Post</h2>
-    <form method="post" action="{% url 'submit' %}" enctype='multipart/form-data'>
-        {% csrf_token %}
-<!--		{{ form.as_p }}-->
-    <br>
-    <div  >
-		  <label style="color:blue;">Title</label>
-						{{ form.title }}
+  <h2>Connected Groups</h2>
+	<br>
+  <ul class="responsive-table">
+    <li class="table-header">
+      <div class="col col-1" >Group id</div>
+      <div class="col col-1" >Group Name</div>
+      <div class="col col-2">Delete</div>
 
-					</div>
-    <br>
+    </li>
+	  {% for group in groups %}
+    <li class="table-row">
+      <div class="col col-1" data-label="Description">{{ group.group_id }}</div>
+      <div class="col col-1" data-label="Description">{{ group.group_name }}</div>
+      <a style="float:right; margin:5px; color: white;" href="/delete_group/{{group.group_id}}/" class="btn btn-danger btn-sm" >Delete</a>
 
-    <div>
-		  <label style="color:blue;">Text</label>
-						{{ form.text }}
-					</div>
-    <br>
-    <div  >
-		  <label style="color:blue;">Post As</label>
-						{{ form.post_as }}
-
-
-					</div>
-    <br>
-        <div>
-		  <label style="color:blue;">On Every</label>
-						{{ form.every }}
-
-
-
-            <label style="color:blue;padding:0px 20px;">At</label>
-						{{ form.time }}
-
-</div>
-
-    <br>
-    <div  >
-		  <label style="color:blue;">Image</label>
-						{{ form.image }}
-					</div>
-
-    <br>
-
-
-
-    <br>
-    <div style="display: flex;
-    justify-content: space-between;">
-		<label style="color:blue;">Groups</label>
-
-		<ul style="margin-top: 10px;margin-bottom:0px;height: 400px; overflow: auto;width:600px;" class="list-group">
-							{% for group in groups %}
-
-                            	<li class="list-group-item">{{ group.group_name }}
-
-									<select name="every-{{group.group_id}}" id="every-{{group.group_id}}">
-
-    <option value="Monday">Monday</option>
-    <option value="Tuesday">Tuesday</option>
-										<option value="Tuesday">Wednesday</option>
-										<option value="Tuesday">Thursday</option>
-										<option value="Tuesday">Friday</option>
-										<option value="Tuesday">Saturday</option>
-										<option value="Tuesday">Sunday</option>
-
-</select>
-
-									<input type="time" id="time-{{group.group_id}}" name="time-{{group.group_id}}">
-
-								</li>
-							{% endfor %}
-
-						</ul>
-
-		<button  type="submit" style="background-color:white;
+    </li>
+	  {% endfor %}
+	  <br>
+	  <div>
+		  <form method="post" action="{% url 'save_group' %}">
+			  {% csrf_token %}
+		  <label >Group ID</label>
+						<input  type="text" name="group_id" style="background-color:white;
 	height:40px;
-	margin-left: 10px;
-	width:140px;
+	margin-left: 50px;
+	width:300px;
 	border-radius:6px;
-	color:white;
-	background-color:blue;
+	color:black;
+box-shadow: 0px 0px 19px 0px rgb(180, 180, 180);
 
-">Publish</button>
+">
+			  <label >Group Name</label>
+						<input  type="text" name="group_name" style="background-color:white;
+	height:40px;
+	margin-left: 50px;
+	width:300px;
+	border-radius:6px;
+	color:black;
+box-shadow: 0px 0px 19px 0px rgb(180, 180, 180);
 
-
-
-		 <br>
-
-
+">
+		  <button style="background-color:white;
+	height:40px;
+	width:130px;
+	color:blue;
+	border-radius:6px;
+	margin-left: 50px;
+box-shadow: 0px 0px 19px 0px rgb(180, 180, 180);
+font-weight: bold;
+">Add Group</button></form>
 					</div>
 
 
 
-    <br>
 
-    </form>
+
+
+
+
+
+
+
+
+  </ul>
+
+	<br>
+</div>
 <!-- partial -->
 
 </body>

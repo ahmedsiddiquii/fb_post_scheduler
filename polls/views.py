@@ -13,10 +13,35 @@ import time
 from django.utils import timezone
 import pytz
 import geoip2.database
+from django.http import JsonResponse
 # path="E:/Analyt IQ/28th/chromedriver"
 # driver = webdriver.Chrome(path)
 
 # Create your views here.
+def group(request):
+   obj = list(GroupModel.objects.filter(username=request.user).values())
+
+   # return render(request, 'home.html', {'pages': obj})
+   return render(request,"group.html",{'groups': obj})
+
+def save_group(request):
+   if request.method=='POST':
+      group_id = request.POST['group_id']
+      group_name = request.POST['group_name']
+      obj = GroupModel()
+      obj.group_id=group_id
+      obj.group_name = group_name
+      obj.username = request.user
+      obj.save()
+   return redirect(group)
+@csrf_exempt
+def login_with_facebook_cookies(request):
+    if request.method == 'POST':
+        facebook_cookies = request.POST.get('facebook_cookies')
+        # TODO: Authenticate user and retrieve Facebook data using the cookies
+        print(facebook_cookies)
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 def add_account(request):
    if request.method=='POST':
@@ -107,6 +132,23 @@ def submit(request):
 
 
          form.save()
+         post_id = form.instance.id
+         groups = list(GroupModel.objects.filter(username=request.user).values())
+
+         for group in groups:
+            group_id =  group['group_id']
+            group_name = group['group_name']
+            every=request.POST['every-'+group_id]
+            time=request.POST['time-'+group_id]
+            obj=GroupPosting()
+            obj.group_id= group_id
+            obj.group_name = group_name
+            obj.every=every
+            obj.time=time
+            obj.post_id=post_id
+            obj.username=request.user
+            obj.save()
+
          return redirect(post_p)
 
       else:
@@ -170,6 +212,24 @@ def update_post(request):
 
          form.save()
 
+         post_id = form.instance.id
+         groups = list(GroupModel.objects.filter(username=request.user).values())
+
+         for group in groups:
+            group_id = group['group_id']
+            # post_id =group['post_id']
+            every = request.POST['every-' + group_id]
+            time = request.POST['time-' + group_id]
+            obj = GroupPosting.objects.get(username=request.user,post_id=post_id,group_id=group_id)
+            # obj.group_id = group_id
+            obj.every = every
+            obj.time = time
+            # group.post_id = post_id
+            # group.username = request.user
+            obj.save()
+
+         # return redirect(post_p)
+
          # form.save()
          return redirect(post_p)
 
@@ -190,6 +250,7 @@ def edit_post(request,id):
       choices.append((i['page_id'], i['page_id']))
    choices = tuple(choices)
    form.fields['post_as'].choices = choices
+   groups = list(GroupPosting.objects.filter(username=request.user,post_id=id).values())
    # form = post_form(initial={"title":obj['title'],"text":obj['text'],
    #                           "post_as":obj["post_as"],"every":obj["every"],
    #                           "time":obj['time'],"group":obj["group"],"image":obj['image']})
@@ -198,7 +259,7 @@ def edit_post(request,id):
    # print(obj)
    # form.title = obj['title']
 
-   return render(request,"edit_post.html",{'form':form})
+   return render(request,"edit_post.html",{'form':form,'groups':groups})
 def login(request):
    return render(request, "index.html")   
 
@@ -214,6 +275,12 @@ def delete_page(request,page_id=None):
 
    PageModel.objects.filter(username=request.user,page_id=page_id).delete()
    return redirect(home)
+
+def delete_group(request,group_id=None):
+   print(request.method)
+
+   GroupModel.objects.filter(username=request.user,group_id=group_id).delete()
+   return redirect(group)
 
 def delete_post(request,title=None):
    print(request.method)
@@ -267,9 +334,10 @@ def title(request):
       choices.append((i['page_id'],i['page_id']))
    choices = tuple(choices)
    print(choices)
+   groups=list(GroupModel.objects.filter(username=request.user).values())
    # user = request.user
    # form.fields['post_as'].choices = choices
-   return render(request,'title.html',{'form':form})
+   return render(request,'title.html',{'form':form,'groups':groups})
 
 def logout_user(request):
    print("logout")

@@ -63,7 +63,58 @@ class BOT:
             btn.click()
         sleep(3)
         return 
-            
+    def page_post(self,title,text,page,image_path):
+        if page.isdigit()==True:
+            self.driver.get("https://www.facebook.com/profile.php?id=" + page)
+        else:
+            self.driver.get("https://www.facebook.com/" + page)
+        time.sleep(5)
+        button_click =  self.driver.find_element("xpath",
+                                                 """//span[text()="What's on your mind?"]""").click()
+
+
+        time.sleep(13)
+        post_input = self.driver.find_element(by="xpath", value="//div[@data-contents='true']")
+        post_input.click()
+        post_input.send_keys(text)
+        sleep(5)
+        image_btn= self.driver.find_element("xpath","//div[@aria-label='Photo/video']")
+        image_btn.click()
+        sleep(3)
+        image = self.driver.find_elements(by='xpath', value="//input[@type='file']")[-1]
+        print(os.getcwd() + r"media/" + image_path)
+        image.send_keys(os.getcwd() + r"/media/" + image_path)
+        sleep(4)
+
+        time.sleep(1)
+        try:
+            send = self.driver.find_element(by="xpath", value="//span[text()='post']").click()
+        except:
+            send = self.driver.find_element(by="xpath", value="//span[text()='Post']").click()
+
+        sleep(15)
+        self.driver.get(self.driver.current_url+"&sk=grid")
+        sleep(7)
+        link= self.driver.find_element("xpath","//div[@class='x1e56ztr xcud41i']//a[@aria-label][@tabindex='0'][@role='link']").get_attribute("href")
+
+
+        print(link)
+        return link
+    def group_post(self,link,group_id):
+        self.driver.get("https://www.facebook.com/groups/" + group_id)
+        time.sleep(5)
+        button_click = self.driver.find_element(by="xpath", value="//span[text()='Write something...']").click()
+        time.sleep(13)
+        post_input = self.driver.find_element(by="xpath", value="//div[@data-contents='true']")
+        post_input.click()
+        post_input.send_keys(link)
+        sleep(9)
+        try:
+            send = self.driver.find_element(by="xpath", value="//span[text()='post']").click()
+        except:
+            send = self.driver.find_element(by="xpath", value="//span[text()='Post']").click()
+
+        sleep(5)
     def post(self,title,text,group,image_path):
         post = title+"\n"+text
     

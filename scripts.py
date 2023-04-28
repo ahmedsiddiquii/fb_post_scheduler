@@ -27,6 +27,7 @@ def login_fb(username,password):
     options.add_argument('--start-maximized')
     options.add_argument('--disable-popup-blocking')
     options.add_argument('--disable-notifications')
+    options.add_argument("--timezone=Asia/Karachi")
 
     # initiate the driver
     # driver = uc.Chrome()
@@ -35,9 +36,12 @@ def login_fb(username,password):
     sleep(0.7)
     for i in range(1000):
         try:
-            usernamee = driver.find_element(By.XPATH, "//input[@aria-label='Email address or phone number']")
+            usernamee = driver.find_element(By.XPATH, "//input[@id='email']")
+            sleep(1)
             usernamee.send_keys(username)
+            sleep(1)
             passwordd = driver.find_element(By.XPATH, "//input[@aria-label='Password']")
+            sleep(1)
             passwordd.send_keys(password)
             sleep(1)
             break

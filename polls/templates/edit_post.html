@@ -100,16 +100,37 @@
 
 
     <br>
-    <div  >
-		  <label style="color:blue;">Group</label>
-						{{ form.group }}
-					</div>
+    <div style="display: flex;
+    justify-content: space-between;">
+		<label style="color:blue;">Groups</label>
 
+		<ul style="margin-top: 10px;margin-bottom:0px;height: 400px; overflow: auto;width:600px;" class="list-group">
+							{% for group in groups %}
 
-    <br>
-    <div  style="justify-content: center;">
+                            	<li class="list-group-item">{{ group.group_name }}
 
-						<button  type="submit" style="background-color:white;
+									<select name="every-{{group.group_id}}" id="every-{{group.group_id}}">
+	{% if group.every == 'Monday' %}
+    <option value="Monday" selected>Monday</option>
+	{% else %}
+	<option value="Monday">Monday</option>
+	{% endif %}
+
+    {% if group.every == 'Monday' %}
+    <option value="Tuesday" selected>Tuesday</option>
+	{% else %}
+	<option value="Tuesday">Monday</option>
+	{% endif %}
+
+</select>
+
+									<input type="time" id="time-{{group.group_id}}" name="time-{{group.group_id}}" value="{{ group.time|time:'H:i' }}">
+								</li>
+							{% endfor %}
+
+						</ul>
+
+		<button  type="submit" style="background-color:white;
 	height:40px;
 	margin-left: 10px;
 	width:140px;
@@ -117,8 +138,19 @@
 	color:white;
 	background-color:blue;
 
-">Update</button>
+">Publish</button>
+
+
+
+		 <br>
+
+
 					</div>
+
+
+
+    <br>
+
     </form>
 <!-- partial -->
 
